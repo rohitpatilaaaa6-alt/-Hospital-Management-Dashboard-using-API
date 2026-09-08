@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Hospital Management Dashboard</title>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f2f6fa;
+    color: #333;
+}
+
+/* Header */
+
+header {
+    background: #0f766e;
+    color: white;
+    padding: 22px;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 6px;
+}
+
+/* Navigation */
+
+nav {
+    background: #115e59;
+    padding: 14px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 18px;
+    font-size: 16px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Main container */
+
+.container {
+    width: 92%;
+    margin: 25px auto;
+}
+
+/* Cards */
+
+.cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px #ccc;
+    flex: 1;
+    min-width: 200px;
+    text-align: center;
+}
+
+.card h2 {
+    color: #0f766e;
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+/* Sections */
+
+.section {
+    background: white;
+    margin-top: 25px;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px #ccc;
+}
+
+.section h2 {
+    color: #0f766e;
+    margin-bottom: 15px;
+}
+
+/* Buttons */
+
+button {
+    padding: 10px 18px;
+    background: #0f766e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0d9488;
+}
+
+/* Search */
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+.search-box input {
+    padding: 10px;
+    width: 280px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+}
+
+/* Tables */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background: #0f766e;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+/* Status */
+
+.status-present {
+    color: green;
+    font-weight: bold;
+}
+
+.status-pending {
+    color: orange;
+    font-weight: bold;
+}
+
+/* Loading */
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+/* Footer */
+
+footer {
+    margin-top: 30px;
+    background: #115e59;
+    color: white;
+    text-align: center;
+    padding: 18px;
+}
+
+/* Responsive */
+
+@media(max-width: 700px) {
+
+    nav a {
+        display: block;
+        margin: 10px;
+    }
+
+    .search-box input {
+        width: 100%;
+    }
+
+    table {
+        font-size: 13px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+    <h1>Hospital Management System</h1>
+
+    <p>Hospital Dashboard using REST API</p>
+
+</header>
+
+
+<nav>
+
+    <a href="#dashboard">Dashboard</a>
+
+    <a href="#patients">Patients</a>
+
+    <a href="#appointments">Appointments</a>
+
+    <a href="#doctors">Doctors</a>
+
+</nav>
+
+
+
+<div class="container">
+
+
+<!-- DASHBOARD -->
+
+<div id="dashboard">
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h2 id="totalPatients">0</h2>
+
+            <p>Total Patients</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2 id="totalAppointments">0</h2>
+
+            <p>Total Appointments</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2 id="totalDoctors">6</h2>
+
+            <p>Total Doctors</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2 id="availableBeds">25</h2>
+
+            <p>Available Beds</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- PATIENTS -->
+
+<div class="section" id="patients">
+
+    <h2>Patient Information</h2>
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="searchPatient"
+            placeholder="Search patient..."
+            onkeyup="searchPatient()"
+        >
+
+        <button onclick="loadPatients()">
+            Refresh Patients
+        </button>
+
+    </div>
+
+
+    <div id="patientLoading" class="loading">
+
+        Loading patients from API...
+
+    </div>
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+
+                <th>Patient Name</th>
+
+                <th>Email</th>
+
+                <th>Phone</th>
+
+                <th>City</th>
+
+                <th>Status</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody id="patientTable">
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+
+<!-- APPOINTMENTS -->
+
+<div class="section" id="appointments">
+
+    <h2>Appointments</h2>
+
+
+    <div id="appointmentLoading" class="loading">
+
+        Loading appointments from API...
+
+    </div>
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+
+                <th>Patient</th>
+
+                <th>Appointment</th>
+
+                <th>Status</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody id="appointmentTable">
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+
+<!-- DOCTORS -->
+
+<div class="section" id="doctors">
+
+    <h2>Doctors</h2>
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+
+                <th>Doctor Name</th>
+
+                <th>Department</th>
+
+                <th>Availability</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            <tr>
+
+                <td>1</td>
+
+                <td>Dr. Rahul Patil</td>
+
+                <td>Cardiology</td>
+
+                <td class="status-present">Available</td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>2</td>
+
+                <td>Dr. Priya Sharma</td>
+
+                <td>Neurology</td>
+
+                <td class="status-present">Available</td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>3</td>
+
+                <td>Dr. Amit Joshi</td>
+
+                <td>Orthopedics</td>
+
+                <td class="status-pending">Busy</td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>4</td>
+
+                <td>Dr. Sneha Deshmukh</td>
+
+                <td>Gynecology</td>
+
+                <td class="status-present">Available</td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>5</td>
+
+                <td>Dr. Raj Kulkarni</td>
+
+                <td>General Medicine</td>
+
+                <td class="status-present">Available</td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>6</td>
+
+                <td>Dr. Neha Shah</td>
+
+                <td>Dermatology</td>
+
+                <td class="status-pending">Busy</td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+</div>
+
+
+
+<footer>
+
+    <p>© 2026 Hospital Management System</p>
+
+</footer>
+
+
+
+<script>
+
+/*
+    ==========================================
+       API URLs
+    ==========================================
+*/
+
+const PATIENT_API =
+    "https://jsonplaceholder.typicode.com/users";
+
+const APPOINTMENT_API =
+    "https://jsonplaceholder.typicode.com/posts";
+
+
+/*
+    ==========================================
+       Global Variables
+    ==========================================
+*/
+
+let patients = [];
+
+let appointments = [];
+
+
+/*
+    ==========================================
+       Load Patients from API
+    ==========================================
+*/
+
+async function loadPatients() {
+
+    const loading =
+        document.getElementById("patientLoading");
+
+    const table =
+        document.getElementById("patientTable");
+
+    loading.style.display = "block";
+
+    table.innerHTML = "";
+
+    try {
+
+        /*
+            GET request to REST API
+        */
+
+        const response =
+            await fetch(PATIENT_API);
+
+
+        /*
+            Convert API response into JSON
+        */
+
+        patients =
+            await response.json();
+
+
+        /*
+            Display patients
+        */
+
+        displayPatients();
+
+
+        /*
+            Update dashboard
+        */
+
+        document.getElementById("totalPatients")
+            .innerText = patients.length;
+
+
+    } catch(error) {
+
+        table.innerHTML =
+            `<tr>
+                <td colspan="6">
+                    Error loading patient data
+                </td>
+             </tr>`;
+
+        console.log(error);
+
+    }
+
+    loading.style.display = "none";
+}
+
+
+
+/*
+    ==========================================
+       Display Patients
+    ==========================================
+*/
+
+function displayPatients(list = patients) {
+
+    const table =
+        document.getElementById("patientTable");
+
+    table.innerHTML = "";
+
+
+    list.forEach((patient) => {
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${patient.id}</td>
+
+                <td>${patient.name}</td>
+
+                <td>${patient.email}</td>
+
+                <td>${patient.phone}</td>
+
+                <td>${patient.address.city}</td>
+
+                <td class="status-present">
+                    Active
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+
+/*
+    ==========================================
+       Search Patient
+    ==========================================
+*/
+
+function searchPatient() {
+
+    const search =
+        document
+        .getElementById("searchPatient")
+        .value
+        .toLowerCase();
+
+
+    const filtered =
+        patients.filter(patient =>
+
+            patient.name
+                .toLowerCase()
+                .includes(search)
+
+        );
+
+
+    displayPatients(filtered);
+
+}
+
+
+
+/*
+    ==========================================
+       Load Appointments from API
+    ==========================================
+*/
+
+async function loadAppointments() {
+
+    const loading =
+        document.getElementById("appointmentLoading");
+
+    const table =
+        document.getElementById("appointmentTable");
+
+
+    loading.style.display = "block";
+
+    table.innerHTML = "";
+
+
+    try {
+
+        /*
+            GET request
+        */
+
+        const response =
+            await fetch(APPOINTMENT_API);
+
+
+        /*
+            Convert response to JSON
+        */
+
+        const data =
+            await response.json();
+
+
+        /*
+            Use first 10 records
+            as demo appointments
+        */
+
+        appointments =
+            data.slice(0, 10);
+
+
+        displayAppointments();
+
+
+        document.getElementById("totalAppointments")
+            .innerText = appointments.length;
+
+
+    } catch(error) {
+
+        table.innerHTML =
+            `<tr>
+                <td colspan="4">
+                    Error loading appointments
+                </td>
+             </tr>`;
+
+        console.log(error);
+
+    }
+
+
+    loading.style.display = "none";
+}
+
+
+
+/*
+    ==========================================
+       Display Appointments
+    ==========================================
+*/
+
+function displayAppointments() {
+
+    const table =
+        document.getElementById("appointmentTable");
+
+    table.innerHTML = "";
+
+
+    appointments.forEach((appointment, index) => {
+
+        const patient =
+            patients[index % patients.length];
+
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${appointment.id}</td>
+
+                <td>
+                    ${patient ? patient.name : "Patient"}
+                </td>
+
+                <td>
+                    ${appointment.title}
+                </td>
+
+                <td class="status-pending">
+                    Pending
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+
+/*
+    ==========================================
+       Load Data when page opens
+    ==========================================
+*/
+
+async function loadHospitalData() {
+
+    await loadPatients();
+
+    await loadAppointments();
+
+}
+
+
+/*
+    Start application
+*/
+
+loadHospitalData();
+
+</script>
+
+
+</body>
+</html>
